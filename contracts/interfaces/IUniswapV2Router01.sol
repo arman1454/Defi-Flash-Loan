@@ -159,3 +159,6 @@ interface IUniswapV2Router01 {
         view
         returns (uint256[] memory amounts);
 }
+
+
+// it will help in doing the swaps also the version 2

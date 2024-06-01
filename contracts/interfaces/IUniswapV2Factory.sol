@@ -26,3 +26,5 @@ interface IUniswapV2Factory {
         external
         returns (address pair);
 }
+
+// it will deal with liquidity pools. When we are implementing flash loan then we need tokens and those tokens will be found from liquidity pool

@@ -34,3 +34,7 @@ interface IERC20 {
         uint256 value
     ) external returns (bool);
 }
+
+
+// Whatever tokens we are going to transfer, all of them follows the standards of ERC20. So with the help 
+// with this whatever token we make like BUSD or cake token. So for these tokens we will use the interface of ERC20

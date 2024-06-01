@@ -109,3 +109,6 @@ interface IUniswapV2Pair {
 
     function initialize(address, address) external;
 }
+
+
+//the tokens of the liquidity pools has their own address. This interface helps to fetch those addresses 
