@@ -26,5 +26,29 @@ contract FlashLoad{
     uint256 private deadline = block.timestamp + 1 days;
     uint256 private constant MAX_INT =
         115792089237316195423570985008687907853269984665640564039457584007913129639935;
-    
+
+    //which token I want to lend? the address of it and the amount I want 
+    function initateArbitrage(address _busdBorrow,uint _amount) external{
+        IERC20(BUSD).safeApprove(address(PANCAKE_ROUTER),MAX_INT);
+        IERC20(CROX).safeApprove(address(PANCAKE_ROUTER),MAX_INT);
+        IERC20(CAKE).safeApprove(address(PANCAKE_ROUTER),MAX_INT);
+
+        //accessing the liquidity pool
+        //give me such a liquidity pool which deal with BUSD and WBNB
+        address pair = IUniswapV2Factory(PANCAKE_FACTORY).getPair(
+            _busdBorrow,
+            WBNB
+         );
+
+        require(pair!=address(0),"Pool does not exist");
+
+        address token0 = IUniswapV2Pair(pair).token0();//WBNB
+        address token1 = IUniswapV2Pair(pair).token1();//BUSD
+
+        uint amount0Out = _busdBorrow==token0?_amount:0;
+        uint amount1Out = _busdBorrow==token1?_amount:0; //BUSD Amount
+
+        bytes memory data = abi.encode(_busdBorrow,_amount,msg.sender);
+        IUniswapV2Pair(pair).swap(amount0Out, amount1Out, address(this), data);
+     }    
 }
