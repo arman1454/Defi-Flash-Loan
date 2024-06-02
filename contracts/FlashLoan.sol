@@ -50,5 +50,31 @@ contract FlashLoad{
 
         bytes memory data = abi.encode(_busdBorrow,_amount,msg.sender);
         IUniswapV2Pair(pair).swap(amount0Out, amount1Out, address(this), data);
+     }
+
+     function pancakeCall(
+        address _sender,
+        uint256 _amount0,
+        uint256 _amount1,
+        bytes calldata _data
+    ) external {
+        address token0 = IUniswapV2Pair(msg.sender).token0();
+        address token1 = IUniswapV2Pair(msg.sender).token1();
+
+        address pair = IUniswapV2Factory(PANCAKE_FACTORY).getPair(
+            token0,
+            token1
+        );
+
+        require(msg.sender == pair, "The sender needs to match the pair");
+        require(_sender == address(this), "Sender should match the contract");
+
+        (address busdBorrow, uint256 amount, address myAddress) = abi.decode(
+            _data,
+            (address, uint256, address)
+        );
+
+        
+
      }    
 }
