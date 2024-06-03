@@ -27,6 +27,18 @@ contract FlashLoad{
     uint256 private constant MAX_INT =
         115792089237316195423570985008687907853269984665640564039457584007913129639935;
 
+
+    
+    
+    
+    function checkResult(uint _repayAmount,uint _acquiredCoin) pure private returns(bool){
+        return _acquiredCoin>_repayAmount;
+    }
+
+    function placeTrade(address _fromToken,address _toToken,uint _amountIn) private returns(uint){
+        
+    }    
+
     //which token I want to lend? the address of it and the amount I want 
     function initateArbitrage(address _busdBorrow,uint _amount) external{
         IERC20(BUSD).safeApprove(address(PANCAKE_ROUTER),MAX_INT);
@@ -49,7 +61,8 @@ contract FlashLoad{
         uint amount1Out = _busdBorrow==token1?_amount:0; //BUSD Amount
 
         bytes memory data = abi.encode(_busdBorrow,_amount,msg.sender);
-        IUniswapV2Pair(pair).swap(amount0Out, amount1Out, address(this), data);
+        IUniswapV2Pair(pair).swap(amount0Out, amount1Out, address(this), data);// swap function calling this..in this function the next function is being called inside
+
      }
 
      function pancakeCall(
@@ -78,7 +91,26 @@ contract FlashLoad{
         uint256 fee = ((amount * 3) / 997) + 1;
         uint256 repayAmount = amount + fee;
 
-        
+        // Assign loan amount
+        uint256 loanAmount = _amount0 > 0 ? _amount0 : _amount1;
+
+        // Place Trades
+        uint256 trade1Coin = placeTrade(BUSD, CROX, loanAmount); //how much BUSD I want to trade with CROS
+        uint256 trade2Coin = placeTrade(CROX, CAKE, trade1Coin); // crox with cake
+        uint256 trade3Coin = placeTrade(CAKE, BUSD, trade2Coin); // cake with BUSD
+
+        // Check Profitability
+        bool profCheck = checkResult(repayAmount, trade3Coin);
+        require(profCheck, "Arbitrage not profitable");
+
+        // Pay Myself
+        IERC20 otherToken = IERC20(BUSD);
+        otherToken.transfer(myAddress, trade3Coin - repayAmount);
+
+        // Pay Loan Back
+        IERC20(busdBorrow).transfer(pair, repayAmount);
+
+
 
 
 
