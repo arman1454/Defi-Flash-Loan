@@ -59,6 +59,10 @@ contract FlashLoad{
                 address(this),
                 deadline 
             )[1];
+
+        require(amountReceived > 0, "Transaction Abort");
+
+        return amountReceived;    
     }    
 
     //which token I want to lend? the address of it and the amount I want 
