@@ -36,7 +36,29 @@ contract FlashLoad{
     }
 
     function placeTrade(address _fromToken,address _toToken,uint _amountIn) private returns(uint){
-        
+        //fetching the pool address
+        address pair = IUniswapV2Factory(PANCAKE_FACTORY).getPair(
+            _fromToken,
+            _toToken
+        );
+
+        require(pair != address(0), "Pool does not exist");
+
+        address[] memory path = new address[](2); //address type array whose length is 2
+        path[0] = _fromToken;
+        path[1] = _toToken;
+
+        uint256 amountRequired = IUniswapV2Router01(PANCAKE_ROUTER)
+            .getAmountsOut(_amountIn, path)[1];
+
+        uint256 amountReceived = IUniswapV2Router01(PANCAKE_ROUTER)
+            .swapExactTokensForTokens(
+                _amountIn, 
+                amountRequired, 
+                path,
+                address(this),
+                deadline 
+            )[1];
     }    
 
     //which token I want to lend? the address of it and the amount I want 
