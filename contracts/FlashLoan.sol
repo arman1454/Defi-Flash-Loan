@@ -35,6 +35,12 @@ contract FlashLoad{
         return _acquiredCoin>_repayAmount;
     }
 
+         // GET CONTRACT BALANCE
+    // Allows public view of balance for contract
+    function getBalanceOfToken(address _address) public view returns (uint256) {
+        return IERC20(_address).balanceOf(address(this));
+    }
+
     function placeTrade(address _fromToken,address _toToken,uint _amountIn) private returns(uint){
         //fetching the pool address
         address pair = IUniswapV2Factory(PANCAKE_FACTORY).getPair(
